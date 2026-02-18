@@ -58,3 +58,41 @@ mount -t proc proc /proc
 Ensures /proc reflects processes from this PID namespace
 
 Often combined with PID namespaces in containers
+
+
+
+
+### Mount namespace fundamentals
+
+1. Each mount namespace has its own list of mount points (a private mount table).
+
+2. When you create a new mount namespace (unshare --mount):
+
+It initially inherits the parent’s mount table
+
+From then on, mount/umount operations are private to this namespace unless propagation is set otherwise
+
+Important: The underlying filesystem objects are shared unless you use tmpfs or overlayfs.
+
+
+### Mount propagation types
+
+Linux allows you to control how mount changes propagate between namespace
+
+| Propagation type | Meaning                                                                        |
+| ---------------- | ------------------------------------------------------------------------------ |
+| `private`        | Default in containers; changes **do not propagate** to parent/other namespaces |
+| `shared`         | Mount/umount changes **propagate** to other shared namespaces                  |
+| `slave`          | Changes propagate **from master to slave**, but not back                       |
+| `unbindable`     | Mount cannot be propagated at all                                              |
+
+
+Docker sets / to private → prevents accidental propagation to host
+
+Docker and Linux containers remount /proc and /sys inside each mount namespace:
+
+/proc shows only processes in this PID namespace
+
+/proc/self/mounts shows mounts visible to this namespace
+
+This is why containers see isolated /proc, even if host has many other mounts
