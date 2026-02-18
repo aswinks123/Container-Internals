@@ -20,7 +20,7 @@ The first process becomes init (PID 1) of that namespace
 
 
 
-### 1 PID 1 Is Special
+### 1. PID 1 Is Special
 
 The first process becomes PID 1.
 
@@ -29,7 +29,7 @@ PID 1 has special signal handling behavior.
 If PID 1 exits -> the namespace dies.
 
 
-### 2 PID Namespaces Are Hierarchical
+### 2. PID Namespaces Are Hierarchical
 
 PID namespaces form a tree.
 
@@ -43,7 +43,7 @@ Cannot see parent processes.
 
 This is a one-way visibility model.
 
-### 3 A Process Has Multiple PIDs
+### 3. A Process Has Multiple PIDs
 
 A process can have:
 
@@ -63,7 +63,7 @@ Kernel sends SIGKILL to all processes in that namespace.
 
 This is why container crashes when main process exits.
 
-### 5 Zombies + Orphans
+### 5. Zombies + Orphans
 
 PID 1 is responsible for:
 
@@ -79,14 +79,14 @@ Use tini
 
 Or proper init system
 
-### 6 PID Namespace Does NOT Isolate Resources
+### 6. PID Namespace Does NOT Isolate Resources
 
 It only isolates: Process IDs, Visibility.
 
 It does NOT isolate: Filesystem, Network, Memory
 
 
-### 7 Kernel Implementation
+### 7. Kernel Implementation
 
 PID namespaces are implemented using:
 
