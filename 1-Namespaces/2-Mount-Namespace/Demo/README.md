@@ -64,7 +64,7 @@ You can see the mount we created inside the namespace is isolated and host/anoth
 
 
 
-## Additional Types of mounts:
+## Additional Type of Mounts:
 
 ### Bind mount
 
