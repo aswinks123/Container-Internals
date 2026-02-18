@@ -81,7 +81,7 @@ From the PID Namespace:
 [root@RHEL ~]# ps -ef
 UID          PID    PPID  C STIME TTY          TIME CMD
 root           1       0  0 11:45 pts/2    00:00:00 bash
-root          32       1  0 11:49 pts/2    00:00:00 sleep 1234  # Observe the PID in namespace
+root          32       1  0 11:49 pts/2    00:00:00 sleep 1234  # Observe the PID in PID-namespace
 root          33       1  0 11:49 pts/2    00:00:00 ps -ef
 [root@RHEL ~]# 
 ```
@@ -101,3 +101,5 @@ Inside namespace = PID 32
 Outside namespace = PID 1574
 
 Same process. Two identities. Two namespace contexts.
+
+

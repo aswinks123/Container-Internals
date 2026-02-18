@@ -1,4 +1,4 @@
-## What Is a PID Namespace
+## What is a PID Namespace
 
 A PID namespace isolates:
 
@@ -112,3 +112,4 @@ unshare: creates a new namespace for the process.
 --mount-proc: /proc must be remounted otherwise ps will still show host processes. Without this, isolation won’t look correct.
 
 bash: Starts a bash shell inside this new namespace. This will be PID 1
+
