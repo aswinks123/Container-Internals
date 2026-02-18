@@ -96,3 +96,47 @@ Docker and Linux containers remount /proc and /sys inside each mount namespace:
 /proc/self/mounts shows mounts visible to this namespace
 
 This is why containers see isolated /proc, even if host has many other mounts
+
+
+
+What we learned so far:
+
+1. Mount namespace basics
+
+Each namespace has its own private mount table
+
+Inherits mounts from parent but future mounts/umounts are private
+
+2. tmpfs mounts
+
+Memory-backed, ephemeral, truly isolated
+
+Perfect for /tmp or /dev/shm inside containers
+
+3. Bind mounts
+
+Mount points isolated to namespace
+
+Files themselves are shared with host → content is visible outside
+
+Propagation (private, shared, slave) controls visibility
+
+4. /proc and /sys remounts
+
+Reflect namespace’s PID and mount table
+
+Containers see only their processes and mounts
+
+5. OverlayFS + container root
+
+Container / = merged lower (image) + upper (writable) layer
+
+Mount namespace ensures this root is isolated from host
+
+6. Mount propagation rules
+
+private, shared, slave → control how mount changes flow between namespaces
+
+7. Real Docker analogy
+
+OverlayFS + tmpfs + bind mounts + /proc remounts = full container filesystem isolation
