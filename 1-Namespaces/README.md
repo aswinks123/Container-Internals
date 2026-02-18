@@ -1,30 +1,13 @@
-Linux namespaces are a kernel feature that isolate system resources between processes.
+# Linux namespaces are a kernel feature that isolate system resources between processes.
 
 This is the foundation of:
 
-Docker
+Docker, Kubernetes, Any container runtime
 
-Kubernetes
-
-Any container runtime
-
-Namespaces isolate:
-
-Processes (PID)
-
-Network stack
-
-Mount points
-
-Hostname
-
-IPC
-
-Users (UID mapping)
+Namespaces isolate: Processes (PID), Network stack, Mount points, Hostname,IPC, Users (UID mapping)
 
 
-FUNDAMENTALS
-------------
+### FUNDAMENTALS
 
 To see all the available namespaces : lsns
 
