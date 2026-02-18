@@ -99,7 +99,7 @@ This is why containers see isolated /proc, even if host has many other mounts
 
 
 
-What we learned so far:
+### What we learned so far:
 
 1. Mount namespace basics
 
