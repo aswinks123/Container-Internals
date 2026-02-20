@@ -1,7 +1,7 @@
 # Network Namespace Demo
 
 
-### STEP 1 — Create a Network Namespace 
+### STEP 1: Create a Network Namespace 
 
 ```
 [root@RHEL ~]# ip netns add ns1
@@ -51,7 +51,7 @@ For this we use something called as veth pair (virtual ethernet cable)
 Whatever enters one side comes out the other side. It is literally a virtual ethernet cable.
 
 
-### STEP 2 — Create the Cable
+### STEP 2: Create the Cable
 
 To create a veth pair cable, run the following command:
 
@@ -95,7 +95,7 @@ veth-host  <=======>  veth-ns
 So each namespace owns one end of the cable.
 
 
-### STEP 3 — Move One Side Into ns1
+### STEP 3: Move One Side Into ns1
 
 ```
 # we are moving the veth-ns end to the namespace ns1
@@ -141,7 +141,7 @@ Now whats next?
 We need to assign the IP address to these interafaces and make it UP.
 
 
-# STEP 4 — Assign IP Addresses
+# STEP 4: Assign IP Addresses
 
 
 Let’s create a small network: 10.0.0.0/24
@@ -351,7 +351,7 @@ Now host will forward packets both directions.
 
 
 
-### Step 5:  Test Connectivity
+### Step 5: Test Connectivity
 
 
 Finally lets verify whether our namespace can connect to the internet!
@@ -445,6 +445,12 @@ ping google.com→ worked
 **This is how a container connect to host and access the internet.**
 
 
+
+
+
+
+### BONUS SESSION : Allow multiple namespaces to talk to each other using a bridge
+
 We have one additional task to complete.
 
 What if there are multiple containers?.
@@ -462,9 +468,9 @@ We need a common Layer 2 switch inside the host.
 That’s exactly what a Linux bridge does.
 
 
-Lets guess a solution:
+**Lets guess a solution:**
 
-``
+```
 ns1 ---\
 ns2 ----[br0]---- host NIC (enp1s0) ---> Internet
 ns3 ---/
@@ -475,12 +481,12 @@ YES!. A bridge can be used to connect multiple namespaces. SO that all local tra
 
 This is exactly docker does. It creates a bridge on host called docker0 and all container or namespaces are connected to it.
 
-**Lets analyse the docker bridge:**
+**Lets analyse the docker bridge**
 
-``
+```
 aswin@Aswin-HP:~$ ip addr show docker0
 
-# This is the bridge Docker created. all containers are connected to this so that they can talk to each other. Its like a virtual switch.
+#This is the bridge Docker created. all containers are connected to this so that they can talk to each other. Its like a virtual switch.
 
 7: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
     link/ether 42:81:c7:a2:ae:fe brd ff:ff:ff:ff:ff:ff
@@ -488,7 +494,7 @@ aswin@Aswin-HP:~$ ip addr show docker0
        valid_lft forever preferred_lft forever
 ```
 
-**Lets see how a bridge can be created:**
+**Lets see how a bridge can be created in Linux**
 
 ```
 # Create bridge
@@ -504,7 +510,9 @@ ip link set br0 up
 
 Only difference is that the gateway of the namespace now points to the bridge.
 
-**Cnnect the Namespace to Bridge**
+**Connect the Namespace to the Bridge**
+
+We only need to attach the host end to the bridge. Namespace end remains the same.
 
 ```
 # Attach host side of veth to bridge
@@ -536,6 +544,9 @@ iptables -A FORWARD -i enp1s0 -o br0 -m state --state RELATED,ESTABLISHED -j ACC
 
 
 Now we completed the Bridge setup. All namespaces/containers can now talk to each other locally through the bridge or to the internet using the host NAT IP.
+
+
+
 
 
 
