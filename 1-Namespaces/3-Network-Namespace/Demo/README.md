@@ -300,6 +300,7 @@ Lets enabled them:
 
 **Enable IP forwarding**
 
+This will allow forwarding of traffic from one interface to another. Where to forward is decided by the route table of host.
 ```
 
 [root@RHEL ~]# sysctl -w net.ipv4.ip_forward=1
@@ -323,15 +324,22 @@ We want traffic from ns1 (10.0.0.0/24) to be rewritten so the outside sees it co
 
 ```
 
-**Now we also need to create forwarding rule for the ns1 and host**
+**Enable IP forwarding rule for the ns1 and host**
+
+Note: Eventhough we enabled IP forwarding, Linux kernal might drop packet if proper iptable rules are not added, so lets add it.
+
+
+
 
 ```
-# Forward packets from bridge/veth to host NIC:
+# Forward packets from bridge/veth to host NIC: for packets sending out of namespace
 
 [root@RHEL ~]# iptables -A FORWARD -i veth-host -o enp1s0 -j ACCEPT
 
 
-iptables -A FORWARD -i enp1s0 -o veth-host -m state --state RELATED,ESTABLISHED -j ACCEPT
+# This is for the return traffic. It states that the traffic from internet that hits the ensp1s0 to veth-host is alloweded only for "RELATED,ESTABLISHED" states. These states mean a connection already initiated by the hsot and not a random connection originated from the internet.
+
+[root@RHEL ~]#   iptables -A FORWARD -i enp1s0 -o veth-host -m state --state RELATED,ESTABLISHED -j ACCEPT
 
 # Check the added rules.
 
