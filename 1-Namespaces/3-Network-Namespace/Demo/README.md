@@ -1,7 +1,7 @@
 # Network Namespace Demo
 
 
-STEP 1 — Create a Network Namespace 
+### STEP 1 — Create a Network Namespace 
 
 ```
 [root@RHEL ~]# ip netns add ns1
@@ -13,11 +13,14 @@ ns1                                 # Namespace ns1 created
 
 ```
 Does ns1 have internet? - NO
+
 Does ns1 have an IP? - NO
+
 Does ns1 have interfaces? - NO
 
 
-Let’s check.
+
+** Let’s check ** 
 
 ```
 
@@ -30,14 +33,9 @@ Let’s check.
 
 ```
 
-You can see that only loopback (lo) is present
+You can see that only loopback (lo) is present. Why Only Loopback?
 
-
-Why Only Loopback?
-
-When Linux creates a network namespace, it creates a brand new empty network stack.
-
-No ethernet, No bridge, No route, Nothing.
+When Linux creates a network namespace, it creates a brand new empty network stack. No ethernet, No bridge, No route, Nothing.
 
 Just loopback.
 
