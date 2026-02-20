@@ -67,6 +67,6 @@ NAT + forwarding = allows isolated namespace to reach Internet.
 Default route = tells the namespace where to send traffic outside its subnet.
 
 
-Review the Demo session where we created a network namespace from scratch and enabled internet capabilities.
+**Note: Review the Demo session where we created a network namespace from scratch and enabled internet capabilities.**
 
 
