@@ -385,7 +385,7 @@ rtt min/avg/max/mdev = 13.602/14.970/16.312/1.311 ms
 
 ```
 
-We have completed creating a Full isolated network stacj for the namespace.
+We have completed creating a Full isolated network stack for the namespace.
 
 1. Created a Network Namespace (ns1)
 
