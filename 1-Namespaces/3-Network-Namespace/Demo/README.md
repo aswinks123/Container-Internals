@@ -20,7 +20,7 @@ Does ns1 have interfaces? - NO
 
 
 
-** Let’s check ** 
+**Let’s check** 
 
 ```
 
