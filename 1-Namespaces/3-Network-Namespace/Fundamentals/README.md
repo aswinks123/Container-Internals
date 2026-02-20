@@ -54,7 +54,7 @@ Containers get IPs on the bridge subnet.
 
 Docker sets up default routes and NAT, giving containers Internet access automatically.
 
-### Key Concepts to Remember
+### Key Concepts
 
 Namespace isolation = separate networking environment.
 

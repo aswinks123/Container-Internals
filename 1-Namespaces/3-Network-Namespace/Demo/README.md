@@ -468,7 +468,7 @@ We need a common Layer 2 switch inside the host.
 That’s exactly what a Linux bridge does.
 
 
-**Lets guess a solution:**
+**Let's guess a solution:**
 
 ```
 ns1 ---\
@@ -477,9 +477,9 @@ ns3 ---/
 
 ```
 
-YES!. A bridge can be used to connect multiple namespaces. SO that all local traffic can be passed through the bridge. and if needed to the internet.
+YES!. A bridge can be used to connect multiple namespaces. So that all local traffic can be passed through the bridge. and if needed to the internet.
 
-This is exactly docker does. It creates a bridge on host called docker0 and all container or namespaces are connected to it.
+This is exactly what docker does. It creates a bridge on host called docker0 and all container or namespaces are connected to it.
 
 **Lets analyse the docker bridge**
 
