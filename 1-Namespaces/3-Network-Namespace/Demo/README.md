@@ -44,14 +44,14 @@ As we know this namespace is isolated, we first need to create a connectivity fr
 
 For this we use something called as veth pair (virtual ethernet cable)
 
-What is a veth Pair?
+**What is a veth Pair?**
 
 [veth-A] <=======> [veth-B]
 
 Whatever enters one side comes out the other side. It is literally a virtual ethernet cable.
 
 
-STEP 2 — Create the Cable
+### STEP 2 — Create the Cable
 
 To create a veth pair cable, run the following command:
 
@@ -95,7 +95,7 @@ veth-host  <=======>  veth-ns
 So each namespace owns one end of the cable.
 
 
-STEP 3 — Move One Side Into ns1
+### STEP 3 — Move One Side Into ns1
 
 ```
 # we are moving the veth-ns end to the namespace ns1
@@ -141,7 +141,7 @@ Now whats next?
 We need to assign the IP address to these interafaces and make it UP.
 
 
-STEP 4 — Assign IP Addresses
+# STEP 4 — Assign IP Addresses
 
 
 Let’s create a small network: 10.0.0.0/24
@@ -153,7 +153,7 @@ Host side → 10.0.0.1
 ns1 side → 10.0.0.2
 
 
-On Host: ip addr add 10.0.0.1/24 dev veth-host
+**On Host: ip addr add 10.0.0.1/24 dev veth-host**
 
 ```
 # Assign IP
@@ -175,7 +175,7 @@ On Host: ip addr add 10.0.0.1/24 dev veth-host
 
 ```
 
-Inside ns1: ip netns exec ns1 ip addr add 10.0.0.2/24 dev veth-ns
+**Inside ns1: ip netns exec ns1 ip addr add 10.0.0.2/24 dev veth-ns**
 
 ```
 # Assign IP
@@ -207,7 +207,7 @@ Host(10.0.0.1)  <=======>  ns1 (10.0.0.2)
 
 Lets try pinging both interface to verify the connectivity:
 
-Pinging from ns1 to host
+**Pinging from ns1 to host**
 
 ```
 [root@RHEL ~]# ip netns exec ns1 ping -c 2 10.0.0.1
@@ -220,7 +220,7 @@ PING 10.0.0.1 (10.0.0.1) 56(84) bytes of data.
 rtt min/avg/max/mdev = 0.053/0.066/0.079/0.013 ms
 ```
 
-Pinging from host to ns1
+**Pinging from host to ns1**
 
 ```
 [root@RHEL ~]# ping -c 2 10.0.0.2
@@ -234,12 +234,12 @@ rtt min/avg/max/mdev = 0.047/0.099/0.151/0.052 ms
 
 
 ```
-Bit how did the ping worked?
+But how did the ping worked?
 
 Because of Kernal route table!. Lets analyse .
 
 ```
-# Chek the route table of the ns1 namespace
+# Check the route table of the ns1 namespace
 
 [root@RHEL ~]# ip netns exec ns1 ip route
 
@@ -256,9 +256,9 @@ Great!. No out namespace can communicate with host machine. This is how Docker c
 
 Now, Can the namespace ns1 connet to the internet???
 
-NO, those IPs are not part of the same subnet (10.0.0.0/24)
+No, those IPs are not part of the same subnet (10.0.0.0/24)
 
-So how do ns1 connect to the internet?. Yes through its default gateway to the host.
+So how do ns1 connect to the internet?. It is through its default gateway to the host. We will check this next.
 
 eg:  default via 10.0.0.1  # Means if  destination is not local, send to 10.0.0.1.
 
@@ -287,7 +287,7 @@ Great!. Our packet now reached the host.!
 
 But here the problem is : Host do not know what to do with this traffic. Sad right?
 
-Now what to do?
+**Now what to do?**
 
 
 To fix this, we need to introduce 2 Linux neworking concepts.
@@ -298,7 +298,7 @@ To fix this, we need to introduce 2 Linux neworking concepts.
 
 Lets enabled them:
 
-Enable IP forwarding
+**Enable IP forwarding**
 
 ```
 
@@ -307,7 +307,7 @@ net.ipv4.ip_forward = 1
 
 ```
 
-Enable NAT (MASQUERADE)
+**Enable NAT (MASQUERADE)**
 
 We want traffic from ns1 (10.0.0.0/24) to be rewritten so the outside sees it coming from host’s IP (enp1s0).
 
@@ -323,7 +323,7 @@ We want traffic from ns1 (10.0.0.0/24) to be rewritten so the outside sees it co
 
 ```
 
-Now we also need to create forwarding rule for the ns1 and host :
+**Now we also need to create forwarding rule for the ns1 and host**
 
 ```
 # Forward packets from bridge/veth to host NIC:
@@ -381,7 +381,8 @@ rtt min/avg/max/mdev = 13.602/14.970/16.312/1.311 ms
 ```
 
 
-OVERVIEW:
+### Overview of what we performed to make this work
+
 ```
 
 We have completed creating a Full isolated network stacj for the namespace.
@@ -440,3 +441,102 @@ ping google.com→ worked
 
 
 ```
+
+**This is how a container connect to host and access the internet.**
+
+
+We have one additional task to complete.
+
+What if there are multiple containers?.
+
+Right now:
+
+```
+ns1 <----> host
+
+```
+Works for 1 namespace, but what if we want ns2, ns3, … to communicate together and also reach Internet?
+
+We need a common Layer 2 switch inside the host.
+
+That’s exactly what a Linux bridge does.
+
+
+Lets guess a solution:
+
+``
+ns1 ---\
+ns2 ----[br0]---- host NIC (enp1s0) ---> Internet
+ns3 ---/
+
+```
+
+YES!. A bridge can be used to connect multiple namespaces. SO that all local traffic can be passed through the bridge. and if needed to the internet.
+
+This is exactly docker does. It creates a bridge on host called docker0 and all container or namespaces are connected to it.
+
+**Lets analyse the docker bridge:**
+
+``
+aswin@Aswin-HP:~$ ip addr show docker0
+
+# This is the bridge Docker created. all containers are connected to this so that they can talk to each other. Its like a virtual switch.
+
+7: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
+    link/ether 42:81:c7:a2:ae:fe brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+       valid_lft forever preferred_lft forever
+```
+
+**Lets see how a bridge can be created:**
+
+```
+# Create bridge
+ip link add name br0 type bridge
+
+# Assign IP to bridge (gateway for namespaces)
+ip addr add 10.0.0.254/24 dev br0
+
+# Bring it up
+ip link set br0 up
+
+```
+
+Only difference is that the gateway of the namespace now points to the bridge.
+
+**Cnnect the Namespace to Bridge**
+
+```
+# Attach host side of veth to bridge
+ip link set veth-host master br0
+ip link set veth-host up
+
+```
+
+Note: The difference is, now we are connecting the host side of the veth to the bridge instead of directly to host.
+
+Namespace side stays the same.
+
+
+**Finally add the NAT and Forwarding rules**
+
+```
+# Allow IP forwarding
+sysctl -w net.ipv4.ip_forward=1
+
+# Masquerade traffic from 10.0.0.0/24 going out enp1s0
+
+iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o enp1s0 -j MASQUERADE
+
+# Allow forwarding
+
+iptables -A FORWARD -i br0 -o enp1s0 -j ACCEPT
+iptables -A FORWARD -i enp1s0 -o br0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+```
+
+
+Now we completed the Bridge setup. All namespaces/containers can now talk to each other locally through the bridge or to the internet using the host NAT IP.
+
+
+
+
